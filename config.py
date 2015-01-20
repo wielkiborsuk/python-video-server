@@ -16,3 +16,5 @@ OPENID_PROVIDERS = [
 
 # administration list
 ADMINS = ['wielki.borsuk@gmail.com']
+
+video_basedir = '/home/borsuk/Pobrane'

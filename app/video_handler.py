@@ -6,7 +6,7 @@ def find_lists(basedir='.'):
     for b, dirs, files in os.walk(basedir):
         flag = False
         for f in files:
-            if f.endswith('avi'):
+            if f.endswith('avi') or f.endswith('mp4'):
                 flag = True
         if flag:
             res.append(b)
@@ -14,7 +14,8 @@ def find_lists(basedir='.'):
 
 
 def list_files(listname):
-    res = [f for f in os.listdir(listname) if f.endswith('avi')]
+    res = ['.'.join(f.split('.')[:-1]) for f in os.listdir(listname)
+           if f.endswith('avi') or f.endswith('mp4')]
     return res
 
 
@@ -28,4 +29,3 @@ if __name__ == '__main__':
     print(lists)
     for l in lists:
         print(list_files(l))
-
