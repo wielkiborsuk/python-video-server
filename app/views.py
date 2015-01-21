@@ -60,5 +60,5 @@ def file_view(lst, filename):
         return
     file_path = os.path.join(list_map[lst], res[0])
 
-    return send_file(file_path)
+    return send_file(video_handler.get_file_contents(file_path), mimetype='video/mp4')
     # return render_template('list.html', files=files, list=lst)

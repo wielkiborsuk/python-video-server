@@ -1,4 +1,10 @@
 import os
+import io
+import pyrana
+from pyrana.formats import find_stream, MediaType
+from pyrana.video import PixelFormat
+
+pyrana.setup()
 
 
 def find_lists(basedir='.'):
@@ -21,7 +27,31 @@ def list_files(listname):
 
 def get_file_contents(file):
     with open(file, 'rb') as f:
-        return f.read()
+        dmx = pyrana.Demuxer(f)
+        sid = find_stream(dmx.streams, 0, MediaType.AVMEDIA_TYPE_VIDEO)
+
+        # vstream = dmx.streams[sid]
+        vdec = dmx.open_decoder(sid)
+        params = {
+            'bit_rate': 800000,
+            'width': 352,
+            'height': 288,
+            'time_base': (1, 25),
+            'pix_fmt': PixelFormat.AV_PIX_FMT_YUV420P,
+        }
+        venc = pyrana.video.Encoder("libx264", params)
+        res = io.BytesIO()
+
+        while True:
+            frame = vdec.decode(dmx.stream(sid))
+            try:
+                pkt = venc.encode(frame)
+                res.write(bytes(pkt))
+            except pyrana.errors.NeedFeedError:
+                pass
+
+        res.writes(bytes(venc.flush()))
+        return res
 
 
 if __name__ == '__main__':
