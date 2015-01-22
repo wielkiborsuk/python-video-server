@@ -1,19 +1,21 @@
 import os
 import io
+import sys
 import pyrana
+import datetime
 from pyrana.formats import find_stream, MediaType, Demuxer, Muxer
 from pyrana.video import PixelFormat
+from app.conv import process_file
 
 pyrana.setup()
+supported_types = ['avi', 'mp4', 'mpg', 'ogv']
 
 
 def find_lists(basedir='.'):
     res = []
     for b, dirs, files in os.walk(basedir):
-        flag = False
-        for f in files:
-            if f.endswith('avi') or f.endswith('mp4') or f.endswith('mpg'):
-                flag = True
+        flag = any([any([f.endswith(t) for t in supported_types])
+                    for f in files])
         if flag:
             res.append(b)
     return res
@@ -21,11 +23,25 @@ def find_lists(basedir='.'):
 
 def list_files(listname):
     res = ['.'.join(f.split('.')[:-1]) for f in os.listdir(listname)
-           if f.endswith('avi') or f.endswith('mp4') or f.endswith('mpg')]
+           if any([f.endswith(t) for t in supported_types])]
     return res
 
 
+def convert_on_the_disk(file):
+    tmpname = '/tmp/' + datetime.datetime.now().timestamp + '.ogv'
+    try:
+        process_file(file, tmpname)
+    except pyrana.errors.PyranaError as err:
+        sys.stderr.write("%s\n" % err)
+    return get_file_contents(tmpname)
+
+
 def get_file_contents(file):
+    with open(file, 'rb') as f:
+        return f.read()
+
+
+def convert_on_the_fly(file):
     with open(file, 'rb') as f:
         dmx = Demuxer(f)
         sid = find_stream(dmx.streams, 0, MediaType.AVMEDIA_TYPE_VIDEO)

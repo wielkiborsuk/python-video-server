@@ -1,9 +1,9 @@
 import os
-from flask import render_template, flash, redirect, session, url_for, request, g
+from flask import render_template, redirect, url_for
 from flask import send_file
 from app import app
-from app import lm
-from app import db, oid
+# from app import lm
+# from app import db, oid
 from app import video_handler
 from config import video_basedir
 
@@ -44,8 +44,24 @@ def list_view(lst):
         return render_template('list.html', files=files, list=lst)
 
 
+@app.route('/video/<lst>/conv/<filename>')
+def file_convert_view(lst, filename):
+    file_path = identify_file(lst, filename)
+
+    return send_file(video_handler.convert_on_the_disk(file_path),
+                     mimetype='video/ogg')
+
+
 @app.route('/video/<lst>/<filename>')
 def file_view(lst, filename):
+    file_path = identify_file(lst, filename)
+
+    # return send_file(video_handler.get_file_contents(file_path),
+    #                  mimetype='video/ogg')
+    return send_file(file_path)
+
+
+def identify_file(lst, filename):
     lists = video_handler.find_lists(video_basedir)
     list_map = {l.split('/')[-1]: l for l in lists}
 
@@ -59,6 +75,4 @@ def file_view(lst, filename):
         redirect(url_for('index'))
         return
     file_path = os.path.join(list_map[lst], res[0])
-
-    return send_file(video_handler.get_file_contents(file_path), mimetype='video/ogg')
-    # return render_template('list.html', files=files, list=lst)
+    return file_path
