@@ -28,7 +28,7 @@ def list_files(listname):
 
 
 def convert_on_the_disk(file):
-    tmpname = '/tmp/' + datetime.datetime.now().timestamp + '.ogv'
+    tmpname = '/tmp/' + str(datetime.datetime.now().timestamp()) + '.ogv'
     try:
         process_file(file, tmpname)
     except pyrana.errors.PyranaError as err:
