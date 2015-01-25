@@ -22,8 +22,10 @@ def find_lists(basedir='.'):
 
 
 def list_files(listname):
-    res = ['.'.join(f.split('.')[:-1]) for f in os.listdir(listname)
+    res = [f for f in os.listdir(listname)
            if any([f.endswith(t) for t in supported_types])]
+    # res = ['.'.join(f.split('.')[:-1]) for f in os.listdir(listname)
+    #        if any([f.endswith(t) for t in supported_types])]
     return res
 
 

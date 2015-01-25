@@ -1,8 +1,19 @@
-{% extends "base.html" %}
-{% block content %}
-<ul>
-  {% for f in files %}
-  <li><a href="/video/{{ list }}/{{ f }}">{{ f }}</a></li>
-  {% endfor %}
-</ul>
-{% endblock %}
+<html ng-app="clientApp">
+  <head>
+    <link rel="stylesheet" href="/static/main.css" />
+    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
+    <script src="/static/clientapp.js"></script>
+  </head>
+  <body ng-controller="MainCtrl">
+    <ul class="nav">
+      {% for f in files %}
+      <li><a href="#" ng-click="select('/video/{{list}}/{{f}}')">{{ f }}</a></li>
+      {% endfor %}
+    </ul>
+    <div class="content">
+      <video name="media" controls player>
+        <source src="/video/{{ list }}/{{ files[0] }}" />
+      </video>
+    </div>
+  </body>
+</html>

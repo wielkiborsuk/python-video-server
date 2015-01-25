@@ -58,8 +58,11 @@ def file_view(lst, filename):
 
     # return send_file(video_handler.get_file_contents(file_path),
     #                  mimetype='video/ogg')
-    return send_file(file_path)
+    return send_file(file_path, mimetype='video/ogg')
 
+@app.route('/static/<fl>')
+def statics(fl):
+    return send_file('./static/' + fl)
 
 def identify_file(lst, filename):
     lists = video_handler.find_lists(video_basedir)
