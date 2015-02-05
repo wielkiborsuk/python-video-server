@@ -9,8 +9,8 @@ import shlex
 # from app.conv import process_file
 
 # pyrana.setup()
-supported = ['mp4', 'mpeg', 'mpg']
-convertable = ['avi', 'mkv', 'ogg', 'wmv']
+supported = ['mp4']
+convertable = ['avi', 'mkv', 'ogg', 'wmv', 'mpeg', 'mpg']
 
 
 def find_lists(basedir='.'):

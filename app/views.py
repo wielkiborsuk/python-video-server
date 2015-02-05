@@ -60,7 +60,7 @@ def file_convert_view(lst, filename):
 
 @app.route('/video/<lst>/<filename>')
 def file_view(lst, filename):
-    if (filename.endswith('.conv')):
+    if filename.endswith('.cnv'):
         return file_convert_view(lst, filename)
     file_path = identify_file(lst, filename)
     if not file_path:

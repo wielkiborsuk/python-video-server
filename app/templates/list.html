@@ -8,9 +8,9 @@
     <ul class="nav">
       {% for f in files %}
       {% if f.endswith('.cnv') %}
-      <li><a href="#" ng-click="select('/video/{{list}}/conv/{{f}}')">{{ f }}</a></li>
+      <li><a href="" ng-click="select('/video/{{list}}/conv/{{f}}')" class="ellipsize" title="{{ f }}">{{ f }}</a></li>
       {% else %}
-      <li><a href="#" ng-click="select('/video/{{list}}/{{f}}')">{{ f }}</a></li>
+      <li><a href="" ng-click="select('/video/{{list}}/{{f}}')" class="ellipsize" title="{{ f }}">{{ f }}</a></li>
       {% endif %}
       {% endfor %}
     </ul>
