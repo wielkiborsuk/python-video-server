@@ -46,36 +46,48 @@ def list_view(lst):
 
 @app.route('/video/<lst>/conv/<filename>')
 def file_convert_view(lst, filename):
+    filename = '.'.join(filename.split('.')[:-1])
     file_path = identify_file(lst, filename)
+    if not file_path:
+        redirect(url_for('index'))
 
-    return send_file(video_handler.convert_on_the_disk(file_path),
-                     mimetype='video/ogg')
+    file_path = video_handler.convert_on_the_disk(file_path)
+    if not file_path:
+        redirect(url_for('index'))
+
+    return send_file(file_path)
 
 
 @app.route('/video/<lst>/<filename>')
 def file_view(lst, filename):
+    if (filename.endswith('.conv')):
+        return file_convert_view(lst, filename)
     file_path = identify_file(lst, filename)
+    if not file_path:
+        # FIXME - redirect needs to be returned
+        redirect(url_for('index'))
 
     # return send_file(video_handler.get_file_contents(file_path),
     #                  mimetype='video/ogg')
-    return send_file(file_path, mimetype='video/ogg')
+    # return send_file(file_path, mimetype='video/ogg')
+    return send_file(file_path)
+
 
 @app.route('/static/<fl>')
 def statics(fl):
     return send_file('./static/' + fl)
+
 
 def identify_file(lst, filename):
     lists = video_handler.find_lists(video_basedir)
     list_map = {l.split('/')[-1]: l for l in lists}
 
     if lst not in list_map:
-        redirect(url_for('index'))
-        return
+        return None
 
     # files = video_handler.list_files(list_map[lst])
     res = [f for f in os.listdir(list_map[lst]) if f.startswith(filename)]
     if not res:
-        redirect(url_for('index'))
-        return
+        return None
     file_path = os.path.join(list_map[lst], res[0])
     return file_path
