@@ -1,12 +1,8 @@
 import os
 import sys
-# import pyrana
-import datetime
 import subprocess
 import shlex
-# from pyrana.formats import find_stream, MediaType, Demuxer, Muxer
-# from pyrana.video import PixelFormat
-# from app.conv import process_file
+import hashlib
 
 # pyrana.setup()
 supported = ['mp4']
@@ -37,11 +33,13 @@ def list_files(listname):
 
 def convert_on_the_disk(file):
     file = shlex.quote(file)
-    print(file)
-    tmpname = '/tmp/' + str(datetime.datetime.now().timestamp()) + '.mp4'
+    tmpname = shlex.quote('/tmp/' + hashlib.md5(file.encode()).hexdigest() +
+                          '.mp4')
     try:
-        cmd = 'avconv -i {} -t 00:00:10 -strict experimental {}'.format(file, tmpname)
-        subprocess.call(cmd, shell=True)
+        if not os.path.exists(tmpname):
+            cmd = ('avconv -i {} -t 00:00:10 -strict experimental {}'
+                   .format(file, tmpname))
+            subprocess.call(cmd, shell=True)
         return tmpname
     except Exception as e:
         print(e)
@@ -53,37 +51,38 @@ def get_file_contents(file):
         return f.read()
 
 
-# def convert_on_the_fly(file):
-#     with open(file, 'rb') as f:
-#         dmx = Demuxer(f)
-#         sid = find_stream(dmx.streams, 0, MediaType.AVMEDIA_TYPE_VIDEO)
+def convert_on_the_fly(file):
+    pass
+    # with open(file, 'rb') as f:
+    #     dmx = Demuxer(f)
+    #     sid = find_stream(dmx.streams, 0, MediaType.AVMEDIA_TYPE_VIDEO)
 
-#         # vstream = dmx.streams[sid]
-#         vdec = dmx.open_decoder(sid)
-#         params = {
-#             'bit_rate': 800000,
-#             'width': 352,
-#             'height': 288,
-#             'pix_fmt': PixelFormat.AV_PIX_FMT_YUV420P,
-#         }
-#         res = io.BytesIO()
-#         res.name = 'out.ogv'
-#         mux = Muxer(res, name='ogv')
-#         venc = mux.open_encoder("libtheora", params)
-#         mux.write_header()
+    #     # vstream = dmx.streams[sid]
+    #     vdec = dmx.open_decoder(sid)
+    #     params = {
+    #         'bit_rate': 800000,
+    #         'width': 352,
+    #         'height': 288,
+    #         'pix_fmt': PixelFormat.AV_PIX_FMT_YUV420P,
+    #     }
+    #     res = io.BytesIO()
+    #     res.name = 'out.ogv'
+    #     mux = Muxer(res, name='ogv')
+    #     venc = mux.open_encoder("libtheora", params)
+    #     mux.write_header()
 
-#         while True:
-#             try:
-#                 frame = vdec.decode(dmx.stream(sid))
-#                 mux.write_frame(venc.encode(frame))
-#             except (pyrana.errors.NeedFeedError, pyrana.errors.EOSError):
-#                 break
+    #     while True:
+    #         try:
+    #             frame = vdec.decode(dmx.stream(sid))
+    #             mux.write_frame(venc.encode(frame))
+    #         except (pyrana.errors.NeedFeedError, pyrana.errors.EOSError):
+    #             break
 
-#         mux.write_packet(venc.flush())
-#         # res.write(bytes(pkt[1]))
-#         mux.write_trailer()
-#         res.flush()
-#         return res
+    #     mux.write_packet(venc.flush())
+    #     # res.write(bytes(pkt[1]))
+    #     mux.write_trailer()
+    #     res.flush()
+    #     return res
 
 
 if __name__ == '__main__':
