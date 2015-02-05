@@ -1,5 +1,12 @@
 {% extends "base.html" %}
 {% block content %}
+Courses:
+<ul>
+  {% for c in courses %}
+  <li><a href="/video/course/{{ c }}">{{ c }}</a></li>
+  {% endfor %}
+</ul>
+Lists:
 <ul>
   {% for list in lists %}
   <li><a href="/video/{{ list }}">{{ list }}</a></li>

@@ -31,18 +31,34 @@ def index():
 
 @app.route('/video')
 def lists():
-    lists = [l.split('/')[-1] for l in video_handler.find_lists(video_basedir)]
-    return render_template('video.html', lists=lists)
+    lists = [l.split('/')[-1] for l in
+             video_handler.find_lists(video_basedir)[1]]
+
+    courses = [c.split('/')[-1] for c in
+               video_handler.find_lists(video_basedir)[0]]
+
+    return render_template('video.html', lists=lists, courses=courses)
+
+
+@app.route('/video/course/<course>')
+def course_view(course):
+    courses, _ = video_handler.find_lists(video_basedir)
+    course_map = {c.split('/')[-1]: c for c in courses}
+
+    if course not in course_map:
+        return redirect(url_for('index'))
+    else:
+        lists = video_handler.list_course(course_map[course])
+        return render_template('course.html', lists=lists, course=course)
 
 
 @app.route('/video/<lst>')
 def list_view(lst):
-    lists = video_handler.find_lists(video_basedir)
+    _, lists = video_handler.find_lists(video_basedir)
     list_map = {l.split('/')[-1]: l for l in lists}
 
     if lst not in list_map:
-        redirect(url_for('index'))
-        return
+        return redirect(url_for('index'))
     else:
         files = video_handler.list_files(list_map[lst])
         return render_template('list.html', files=files, list=lst)
@@ -83,7 +99,7 @@ def statics(fl):
 
 
 def identify_file(lst, filename):
-    lists = video_handler.find_lists(video_basedir)
+    _, lists = video_handler.find_lists(video_basedir)
     list_map = {l.split('/')[-1]: l for l in lists}
 
     if lst not in list_map:
@@ -121,7 +137,7 @@ def send_file_partial(path):
 
     length = size - byte1
     if byte2 is not None:
-        length = byte2 - byte1
+        length = byte2 - byte1 + 1
 
     data = None
     with open(path, 'rb') as f:

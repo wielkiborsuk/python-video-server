@@ -10,13 +10,23 @@ convertable = ['avi', 'mkv', 'ogg', 'wmv', 'mpeg', 'mpg']
 
 
 def find_lists(basedir='.'):
-    res = []
+    lists = []
     for b, dirs, files in os.walk(basedir):
         flag = any([any([f.endswith(t) for t in (supported + convertable)])
                     for f in files])
         if flag:
-            res.append(b)
-    return res
+            lists.append(b)
+
+    courses = []
+    for b, dirs, files in os.walk(basedir):
+        if 'course.md' in files:
+            for d in dirs:
+                try:
+                    lists.remove(os.path.join(b, d))
+                except Exception:
+                    pass
+            courses.append(b)
+    return courses, lists
 
 
 def list_files(listname):
@@ -27,6 +37,15 @@ def list_files(listname):
     res.extend(['.'.join(f.split('.')[:-1])+'.cnv' for f in os.listdir(listname)
                 if any([f.endswith(t) for t in convertable])])
     res.sort()
+
+    return res
+
+
+def list_course(course):
+    _, lists = find_lists(course)
+    lists.sort()
+    res = [{'name': l.split('/')[-1], 'path':l, 'files': list_files(l)}
+           for l in lists]
 
     return res
 
