@@ -10,11 +10,10 @@ angular.module('clientApp', [])
     //});
 
     $scope.select = function (video) {
-      console.log('hahaha')
       $scope.curr = video;
       //$scope.player.src = $scope.filePrefix + '/' + video;
       $scope.player.src = video;
-      $scope.player.children()[0].src = video;
+      //$scope.player.children()[0].src = video;
       $scope.player.load();
       $scope.player.play();
     }

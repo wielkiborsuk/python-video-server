@@ -7,21 +7,17 @@
   <body ng-controller="MainCtrl">
     <ul class="nav">
       {% for list in lists %}
-      <li><a>{{ list.name }}</a></li>
-      <ul>
+      <li><a ng-click="select('/video/{{ list.name }}/{{ list.files[0] }}')" class="ellipsize header" title="{{ list.name }}">{{ list.name }}</a></li>
+      <ul style="margin-left: 10px;">
         {% for f in list.files %}
-        {% if f.endswith('.cnv') %}
-        <li><a href="" ng-click="select('/video/{{list}}/conv/{{f}}')" class="ellipsize" title="{{ f }}">{{ f }}</a></li>
-        {% else %}
-        <li><a href="" ng-click="select('/video/{{list}}/{{f}}')" class="ellipsize" title="{{ f }}">{{ f }}</a></li>
-        {% endif %}
+        <li><a ng-click="select('/video/{{ list.name }}/{{ f }}')" class="ellipsize" title="{{ f }}">{{ f }}</a></li>
         {% endfor %}
       </ul>
       {% endfor %}
     </ul>
     <div class="content">
       <video name="media" controls player>
-        <source src="/video/{{ list }}/{{ files[0] }}" />
+        <source src="/video/{{ lists[0].name }}/{{ lists[0].files[0] }}" />
       </video>
     </div>
   </body>

@@ -22,7 +22,8 @@ def find_lists(basedir='.'):
         if 'course.md' in files:
             for d in dirs:
                 try:
-                    lists.remove(os.path.join(b, d))
+                    pass
+                    # lists.remove(os.path.join(b, d))
                 except Exception:
                     pass
             courses.append(b)
