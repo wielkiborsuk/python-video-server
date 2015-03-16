@@ -1,12 +1,18 @@
 import os
 import sys
-import subprocess
+# import subprocess
 import shlex
 import hashlib
+import threading
+from app.background_processor import UniqueQueue
+from app.background_processor import process_videos
 
 # pyrana.setup()
 supported = ['mp4']
 convertable = ['avi', 'mkv', 'ogg', 'wmv', 'mpeg', 'mpg']
+queue = UniqueQueue()
+worker = threading.Thread(target=process_videos, args=(queue,))
+worker.start()
 
 
 def find_lists(basedir='.'):
@@ -57,9 +63,10 @@ def convert_on_the_disk(file):
                           '.mp4')
     try:
         if not os.path.exists(tmpname):
-            cmd = ('avconv -i {} -t 00:00:10 -strict experimental {}'
-                   .format(file, tmpname))
-            subprocess.call(cmd, shell=True)
+            queue.put([file, tmpname])
+            # cmd = ('avconv -i {} -t 00:00:10 -strict experimental {}'
+            #        .format(file, tmpname))
+            # subprocess.call(cmd, shell=True)
         return tmpname
     except Exception as e:
         print(e)

@@ -120,6 +120,7 @@ def after_request(response):
 
 
 def send_file_partial(path):
+    print(path)
     range_header = request.headers.get('Range', None)
     if not range_header:
         return send_file(path)
