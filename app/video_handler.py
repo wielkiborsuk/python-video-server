@@ -1,11 +1,11 @@
 import os
-import sys
 # import subprocess
 import shlex
 import hashlib
 import threading
 from app.background_processor import UniqueQueue
 from app.background_processor import process_videos
+from config import video_basedir
 
 # pyrana.setup()
 supported = ['mp4']
@@ -15,7 +15,7 @@ worker = threading.Thread(target=process_videos, args=(queue,))
 worker.start()
 
 
-def find_lists(basedir='.'):
+def find_lists(basedir=video_basedir):
     lists = []
     for b, dirs, files in os.walk(basedir):
         flag = any([any([f.endswith(t) for t in (supported + convertable)])
@@ -37,13 +37,14 @@ def find_lists(basedir='.'):
 
 
 def list_files(listname):
-    # res = [f for f in os.listdir(listname)
-    #        if any([f.endswith(t) for t in supported])]
-    res = ['.'.join(f.split('.')[:-1]) for f in os.listdir(listname)
+    res = [{'file': '.'.join(f.split('.')[:-1]), 'ready': True}
+           for f in os.listdir(listname)
            if any([f.endswith(t) for t in supported])]
-    res.extend(['.'.join(f.split('.')[:-1])+'.cnv' for f in os.listdir(listname)
+    res.extend([{'file': '.'.join(f.split('.')[:-1])+'.cnv', 'ready':
+                 os.path.exists(tmpfilename(os.path.join(listname, f)))}
+                for f in os.listdir(listname)
                 if any([f.endswith(t) for t in convertable])])
-    res.sort()
+    res.sort(key=lambda el: el['file'])
 
     return res
 
@@ -57,20 +58,20 @@ def list_course(course):
     return res
 
 
+def tmpfilename(file):
+    return '/tmp/{}.mp4'.format(hashlib.md5(file.encode()).hexdigest())
+
+
 def convert_on_the_disk(file):
+    tmpname = shlex.quote(tmpfilename(file))
     file = shlex.quote(file)
-    tmpname = shlex.quote('/tmp/' + hashlib.md5(file.encode()).hexdigest() +
-                          '.mp4')
-    try:
+
+    msg = {'f1': file, 'f2': tmpname}
+    if msg not in queue:
         if not os.path.exists(tmpname):
-            queue.put({'f1': file, 'f2': tmpname})
-            # cmd = ('avconv -i {} -t 00:00:10 -strict experimental {}'
-            #        .format(file, tmpname))
-            # subprocess.call(cmd, shell=True)
-        return tmpname
-    except Exception as e:
-        print(e)
-        sys.stderr.write("%s\n" % e)
+            queue.put(msg)
+        else:
+            return tmpname
 
 
 def get_file_contents(file):
@@ -110,6 +111,21 @@ def convert_on_the_fly(file):
     #     mux.write_trailer()
     #     res.flush()
     #     return res
+
+
+def identify_file(lst, filename, video_basedir=video_basedir):
+    _, lists = find_lists(video_basedir)
+    list_map = {l.split('/')[-1]: l for l in lists}
+
+    if lst not in list_map:
+        return None
+
+    # files = video_handler.list_files(list_map[lst])
+    res = [f for f in os.listdir(list_map[lst]) if f.startswith(filename)]
+    if not res:
+        return None
+    file_path = os.path.join(list_map[lst], res[0])
+    return file_path
 
 
 if __name__ == '__main__':
