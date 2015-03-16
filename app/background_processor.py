@@ -9,11 +9,14 @@ class UniqueQueue(queue.Queue):
         self.queue = []
 
     def _put(self, el):
-        if el not in self.list:
+        if el not in self.queue:
             self.queue.append(el)
 
     def _get(self):
         return self.queue.pop()
+
+    def __contains__(self, element):
+        return element in self.queue
 
 
 def process_videos(queue):

@@ -63,7 +63,7 @@ def convert_on_the_disk(file):
                           '.mp4')
     try:
         if not os.path.exists(tmpname):
-            queue.put([file, tmpname])
+            queue.put({'f1': file, 'f2': tmpname})
             # cmd = ('avconv -i {} -t 00:00:10 -strict experimental {}'
             #        .format(file, tmpname))
             # subprocess.call(cmd, shell=True)
