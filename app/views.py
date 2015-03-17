@@ -94,7 +94,8 @@ def request_video(lst, filename):
             return '{"status": 200, "msg": "ok"}'
         time.sleep(1)
 
-    return 500
+    return '500'
+
 
 @app.route('/video/<lst>/<filename>')
 def file_view(lst, filename):

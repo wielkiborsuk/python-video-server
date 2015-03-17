@@ -14,7 +14,7 @@ angular.module('clientApp', [])
       $http.get(url).success(function (res) {
         file.ready = true;
       }).error(function (res, status) {
-        $timeout(function () {request_video(list, file)}, 0, true);
+        $timeout(function () {request_video(list, file)}, 2000, true);
       });
     };
 
