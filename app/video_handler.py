@@ -12,6 +12,7 @@ supported = ['mp4']
 convertable = ['avi', 'mkv', 'ogg', 'wmv', 'mpeg', 'mpg']
 queue = UniqueQueue()
 worker = threading.Thread(target=process_videos, args=(queue,))
+worker.setDaemon(True)
 worker.start()
 
 
@@ -62,11 +63,12 @@ def tmpfilename(file):
     return '/tmp/{}.mp4'.format(hashlib.md5(file.encode()).hexdigest())
 
 
-def convert_on_the_disk(file):
-    tmpname = shlex.quote(tmpfilename(file))
-    file = shlex.quote(file)
+def convert_on_the_disk(msg):
+    tmpname = shlex.quote(tmpfilename(msg['file']))
+    file = shlex.quote(msg['file'])
+    msg['tmpname'] = tmpname
 
-    msg = {'f1': file, 'f2': tmpname}
+    # msg = {'f1': file, 'f2': tmpname}
     if msg not in queue:
         if not os.path.exists(tmpname):
             queue.put(msg)

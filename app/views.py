@@ -88,9 +88,10 @@ def request_video(lst, filename):
     if not file_path:
         redirect(url_for('index'))
 
+    msg = {'file': file_path, 'res': False}
     while True:
-        res = video_handler.convert_on_the_disk(file_path)
-        if (res):
+        res = video_handler.convert_on_the_disk(msg)
+        if (msg['res']):
             return '{"status": 200, "msg": "ok"}'
         time.sleep(1)
 
