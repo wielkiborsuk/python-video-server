@@ -8,19 +8,16 @@ class UniqueQueue(queue.Queue):
     """Docstring for UniqueQueue. """
 
     def _init(self, maxsize):
-        # super()._init(maxsize)
-        self.queue = []
+        super()._init(maxsize)
         self.history = []
 
     def _put(self, el):
-        # super()._put(el)
         if el not in self.history:
-            self.queue.append(el)
+            super()._put(el)
             self.history.append(el)
 
     def _get(self):
-        # super()._get()
-        return self.queue.pop(0)
+        return super()._get()
 
     def __contains__(self, element):
         return element in self.history

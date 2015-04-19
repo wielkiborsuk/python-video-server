@@ -3,6 +3,7 @@ import re
 import mimetypes
 import json
 import time
+from functools import partial
 from flask import render_template, redirect, url_for
 from flask import send_file
 from flask import request
@@ -16,21 +17,6 @@ from config import video_basedir
 
 @app.route('/')
 @app.route('/index')
-def index():
-    user = {'nickname': 'wielki.borsuk', 'email': 'wielki.borsuk@gmail.com'}
-    posts = [
-        {
-            'author': {'nickname': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'nickname': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
-    return render_template('index.html', title='Home', user=user, posts=posts)
-
-
 @app.route('/video')
 def lists():
     lists = [l.split('/')[-1] for l in
@@ -74,7 +60,6 @@ def file_convert_view(lst, filename):
         redirect(url_for('index'))
 
     file_path = video_handler.tmpfilename(file_path)
-    # file_path = video_handler.convert_on_the_disk(file_path)
     if not file_path:
         redirect(url_for('index'))
 
@@ -89,8 +74,9 @@ def request_video(lst, filename):
         redirect(url_for('index'))
 
     msg = {'file': file_path, 'res': False}
+    video_handler.convert_on_the_disk(msg)
+
     while True:
-        res = video_handler.convert_on_the_disk(msg)
         if (msg['res']):
             return '{"status": 200, "msg": "ok"}'
         time.sleep(1)
@@ -107,9 +93,6 @@ def file_view(lst, filename):
         # FIXME - redirect needs to be returned
         redirect(url_for('index'))
 
-    # return send_file(video_handler.get_file_contents(file_path),
-    #                  mimetype='video/ogg')
-    # return send_file(file_path, mimetype='video/ogg')
     return send_file_partial(file_path)
 
 
@@ -125,10 +108,7 @@ def after_request(response):
 
 
 def send_file_partial(path):
-    print(path)
     range_header = request.headers.get('Range', None)
-    if not range_header:
-        return send_file(path)
 
     size = os.path.getsize(path)
     byte1, byte2 = 0, None
@@ -145,12 +125,20 @@ def send_file_partial(path):
     if byte2 is not None:
         length = byte2 - byte1 + 1
 
-    data = None
-    with open(path, 'rb') as f:
-        f.seek(byte1)
-        data = f.read(length)
+    def generate():
+        chunksize = 1024 * 1024
+        with open(path, 'rb') as f:
+            f.seek(byte1)
+            count = 0
+            for chunk in iter(partial(f.read, chunksize), ''):
+                chunk = (chunk[:(length-count)]
+                         if length < count + chunksize else chunk)
+                count += chunksize
+                yield chunk
+                if count > length:
+                    return
 
-    rv = Response(data,
+    rv = Response(generate(),
                   206,
                   mimetype=mimetypes.guess_type(path)[0],
                   direct_passthrough=True)

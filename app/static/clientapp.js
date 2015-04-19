@@ -4,11 +4,6 @@ angular.module('clientApp', [])
   .controller('MainCtrl', function ($scope, $http, $timeout) {
     $scope.curr = '';
 
-    //$http.get($scope.prefix + '/list/').then(function (res) {
-      //console.log(res);
-      //$scope.list = res.data;
-    //});
-
     function request_video(list, file) {
       var url = '/video/request/' + list + '/' + file.file;
       $http.get(url).success(function (res) {

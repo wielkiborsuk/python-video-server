@@ -1,10 +1,9 @@
 from app.background_processor import UniqueQueue
-import threading
+
 
 class TestUnique():
     def setup_method(self, method):
         self.q = UniqueQueue(5)
-
 
     def test_add(self):
         elem = {'a': 'al', 'b': 'bl'}
@@ -22,9 +21,8 @@ class TestUnique():
         self.q.put(elem)
         self.q.put(elem2)
 
-        assert self.q.queue == [elem, elem2]
+        assert list(self.q.queue) == [elem, elem2]
 
         e = self.q.get()
         assert e == elem
-        assert self.q.queue == [elem2]
-
+        assert list(self.q.queue) == [elem2]

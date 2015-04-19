@@ -65,54 +65,13 @@ def tmpfilename(file):
 
 def convert_on_the_disk(msg):
     tmpname = shlex.quote(tmpfilename(msg['file']))
-    file = shlex.quote(msg['file'])
     msg['tmpname'] = tmpname
 
-    # msg = {'f1': file, 'f2': tmpname}
     if msg not in queue:
         if not os.path.exists(tmpname):
             queue.put(msg)
         else:
             return tmpname
-
-
-def get_file_contents(file):
-    with open(file, 'rb') as f:
-        return f.read()
-
-
-def convert_on_the_fly(file):
-    pass
-    # with open(file, 'rb') as f:
-    #     dmx = Demuxer(f)
-    #     sid = find_stream(dmx.streams, 0, MediaType.AVMEDIA_TYPE_VIDEO)
-
-    #     # vstream = dmx.streams[sid]
-    #     vdec = dmx.open_decoder(sid)
-    #     params = {
-    #         'bit_rate': 800000,
-    #         'width': 352,
-    #         'height': 288,
-    #         'pix_fmt': PixelFormat.AV_PIX_FMT_YUV420P,
-    #     }
-    #     res = io.BytesIO()
-    #     res.name = 'out.ogv'
-    #     mux = Muxer(res, name='ogv')
-    #     venc = mux.open_encoder("libtheora", params)
-    #     mux.write_header()
-
-    #     while True:
-    #         try:
-    #             frame = vdec.decode(dmx.stream(sid))
-    #             mux.write_frame(venc.encode(frame))
-    #         except (pyrana.errors.NeedFeedError, pyrana.errors.EOSError):
-    #             break
-
-    #     mux.write_packet(venc.flush())
-    #     # res.write(bytes(pkt[1]))
-    #     mux.write_trailer()
-    #     res.flush()
-    #     return res
 
 
 def identify_file(lst, filename, video_basedir=video_basedir):
