@@ -7,5 +7,6 @@ curl https://bootstrap.pypa.io/get-pip.py | python3
 deactivate
 source flask/bin/activate
 
-pip3 install flask flask-login flask-openid flask-mail flask-sqlalchemy sqlalchemy-migrate flask-whooshalchemy flask-wtf flask-babel guess_language flipflop coverage pymedia2-pyrana
+#pip3 install flask flask-login flask-sqlalchemy flask-wtf flipflop coverage pymedia2-pyrana
+pip install -r requirements.txt
 
