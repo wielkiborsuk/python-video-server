@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('clientApp', [])
-  .controller('MainCtrl', function ($scope, $http, $timeout) {
+  .controller('MainCtrl', function ($scope, $http, $timeout, $document) {
     $scope.curr = '';
 
     function request_video(list, file) {
@@ -12,6 +12,14 @@ angular.module('clientApp', [])
         $timeout(function () {request_video(list, file)}, 2000, true);
       });
     };
+
+    $scope.getCourseLists = function (course) {
+      $http.get('/video/course/'+course+'/lists').then(function (res) {
+        $scope.lists = res.data;
+        $scope.select($scope.lists[0].name, $scope.lists[0].files[0]);
+      });
+    }
+
 
     $scope.select = function (list, file) {
       if (!file.ready) {

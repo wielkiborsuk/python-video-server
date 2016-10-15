@@ -1,24 +1,29 @@
-<html ng-app="clientApp">
+<html data-ng-app="clientApp">
   <head>
     <link rel="stylesheet" href="/static/main.css" />
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.15/angular.min.js"></script>
     <script src="/static/clientapp.js"></script>
   </head>
-  <body ng-controller="MainCtrl">
+  <body data-ng-controller="MainCtrl" data-ng-init="getCourseLists('{{course}}')">
+    {% raw %}
     <ul class="nav">
-      {% for list in lists %}
-      <li><a ng-click="select('/video/{{ list.name }}/{{ list.files[0] }}')" class="ellipsize header" title="{{ list.name }}">{{ list.name }}</a></li>
-      <ul style="margin-left: 10px;">
-        {% for f in list.files %}
-        <li><a ng-click="select('/video/{{ list.name }}/{{ f }}')" class="ellipsize" title="{{ f }}">{{ f }}</a></li>
-        {% endfor %}
-      </ul>
-      {% endfor %}
+      <li data-ng-repeat="list in lists">
+        <a data-ng-click="select(list.name, list.files[0])" class="ellipsize header" title="{{ list.name }}">{{ list.name }}</a>
+        <ul style="margin-left: 10px;">
+          <li data-ng-repeat="f in list.files">
+            <a data-ng-click="select(list.name, f)" class="ellipsize" title="{{ f.file }}"
+              data-ng-class="{true: 'green'}[f.ready]">
+              {{ f.file }}
+            </a>
+          </li>
+        </ul>
+      </li>
     </ul>
     <div class="content">
       <video name="media" controls player>
-        <source src="/video/{{ lists[0].name }}/{{ lists[0].files[0] }}" />
+        <source />
       </video>
     </div>
+    {% endraw %}
   </body>
 </html>

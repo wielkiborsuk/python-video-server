@@ -36,8 +36,16 @@ def course_view(course):
     if course not in course_map:
         return redirect(url_for('index'))
     else:
-        lists = video_handler.list_course(course_map[course])
-        return render_template('course.html', lists=lists, course=course)
+        return render_template('course.html', course=course)
+
+
+@app.route('/video/course/<course>/lists')
+def course_lists_json(course):
+    courses, _ = video_handler.find_lists(video_basedir)
+    course_map = {c.split('/')[-1]: c for c in courses}
+
+    lists = video_handler.list_course(course_map[course])
+    return json.dumps(lists)
 
 
 @app.route('/video/<lst>')
