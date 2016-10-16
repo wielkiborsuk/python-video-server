@@ -5,3 +5,4 @@ flask-wtf
 flipflop
 coverage
 pymedia2-pyrana
+pytest

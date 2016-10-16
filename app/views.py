@@ -4,7 +4,7 @@ import mimetypes
 import json
 # import time
 from functools import partial
-from flask import render_template, redirect, url_for
+from flask import render_template, redirect
 from flask import send_file
 from flask import request
 from flask import Response
@@ -34,7 +34,7 @@ def course_view(course):
     course_map = {c.split('/')[-1]: c for c in courses}
 
     if course not in course_map:
-        return redirect(url_for('index'))
+        return redirect('index')
     else:
         return render_template('course.html', course=course)
 
@@ -54,7 +54,7 @@ def list_view(lst):
     list_map = {l.split('/')[-1]: l for l in lists}
 
     if lst not in list_map:
-        return redirect(url_for('index'))
+        return redirect('index')
     else:
         files = video_handler.list_files(list_map[lst])
         return render_template('list.html', files=json.dumps(files), list=lst)
@@ -65,11 +65,11 @@ def file_convert_view(lst, filename):
     filename = '.'.join(filename.split('.')[:-1])
     file_path = video_handler.identify_file(lst, filename, video_basedir)
     if not file_path:
-        redirect(url_for('index'))
+        redirect('index')
 
     file_path = video_handler.tmpfilename(file_path)
     if not file_path:
-        redirect(url_for('index'))
+        redirect('index')
 
     return send_file_partial(file_path)
 
@@ -99,7 +99,7 @@ def file_view(lst, filename):
     file_path = video_handler.identify_file(lst, filename, video_basedir)
     if not file_path:
         # FIXME - redirect needs to be returned
-        redirect(url_for('index'))
+        redirect('index')
 
     return send_file_partial(file_path)
 
