@@ -2,7 +2,7 @@ import os
 import re
 import mimetypes
 import json
-import time
+# import time
 from functools import partial
 from flask import render_template, redirect, url_for
 from flask import send_file
@@ -74,22 +74,22 @@ def file_convert_view(lst, filename):
     return send_file_partial(file_path)
 
 
+@app.route('/video/request/<lst>/<filename>/status')
+def check_status(lst, filename):
+    filename = '.'.join(filename.split('.')[:-1])
+    file_path = video_handler.identify_file(lst, filename, video_basedir)
+
+    return json.dumps(video_handler.check_status(file_path))
+
+
 @app.route('/video/request/<lst>/<filename>')
 def request_video(lst, filename):
     filename = '.'.join(filename.split('.')[:-1])
     file_path = video_handler.identify_file(lst, filename, video_basedir)
-    if not file_path:
-        redirect(url_for('index'))
 
-    msg = {'file': file_path, 'res': False}
-    video_handler.convert_on_the_disk(msg)
+    tmpfile = video_handler.convert_on_the_disk(file_path)
 
-    while True:
-        if (msg['res']):
-            return '{"status": 200, "msg": "ok"}'
-        time.sleep(1)
-
-    return '500'
+    return json.dumps({"status": 200, "tmpfile": tmpfile})
 
 
 @app.route('/video/<lst>/<filename>')

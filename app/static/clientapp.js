@@ -6,12 +6,21 @@ angular.module('clientApp', [])
 
     function request_video(list, file) {
       var url = '/video/request/' + list + '/' + file.file;
-      $http.get(url).success(function (res) {
-        file.ready = true;
-      }).error(function (res, status) {
-        $timeout(function () {request_video(list, file)}, 2000, true);
+      $http.get(url).then(function (res) {
+        $timeout(function () { check_status(list, file) }, 2000, true);
       });
     };
+
+    function check_status(list, file) {
+      var url = '/video/request/' + list + '/' + file.file + '/status';
+      $http.get(url).then(function (res) {
+        file.ready = res.data.ready;
+        file.pending = res.data.pending;
+        if (!file.ready) {
+          $timeout(function () { check_status(list, file) }, 2000, true);
+        }
+      });
+    }
 
     $scope.getCourseLists = function (course) {
       $http.get('/video/course/'+course+'/lists').then(function (res) {
@@ -19,7 +28,6 @@ angular.module('clientApp', [])
         $scope.select($scope.lists[0].name, $scope.lists[0].files[0]);
       });
     }
-
 
     $scope.select = function (list, file) {
       if (!file.ready) {

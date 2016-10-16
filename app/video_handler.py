@@ -37,12 +37,23 @@ def find_lists(basedir=video_basedir):
     return courses, lists
 
 
+
+def is_pending(file_path):
+    return (os.path.exists(tmpfilename(file_path)) and
+            get_msg_for_file(file_path) in queue)
+
+
+def is_ready(file_path):
+    return (os.path.exists(tmpfilename(file_path)) and
+            not is_pending(file_path))
+
+
 def list_files(listname):
     res = [{'file': '.'.join(f.split('.')[:-1]), 'ready': True}
            for f in os.listdir(listname)
            if any([f.endswith(t) for t in supported])]
     res.extend([{'file': '.'.join(f.split('.')[:-1])+'.cnv', 'ready':
-                 os.path.exists(tmpfilename(os.path.join(listname, f)))}
+                 is_ready(os.path.join(listname, f))}
                 for f in os.listdir(listname)
                 if any([f.endswith(t) for t in convertable])])
     res.sort(key=lambda el: el['file'])
@@ -63,15 +74,20 @@ def tmpfilename(file):
     return '/tmp/{}.mp4'.format(hashlib.md5(file.encode()).hexdigest())
 
 
-def convert_on_the_disk(msg):
-    tmpname = shlex.quote(tmpfilename(msg['file']))
-    msg['tmpname'] = tmpname
+def get_msg_for_file(file_path):
+    tmpname = shlex.quote(tmpfilename(file_path))
+    return {'file': file_path, 'tmpname': tmpname}
 
-    if msg not in queue:
-        if not os.path.exists(tmpname):
-            queue.put(msg)
-        else:
-            return tmpname
+
+def convert_on_the_disk(file_path):
+    if not is_ready(file_path) and not is_pending(file_path):
+        queue.put(get_msg_for_file(file_path))
+    return tmpfilename(file_path)
+
+
+def check_status(file_path):
+    return {'ready': is_ready(file_path),
+            'pending': is_pending(file_path)}
 
 
 def identify_file(lst, filename, video_basedir=video_basedir):
@@ -81,7 +97,6 @@ def identify_file(lst, filename, video_basedir=video_basedir):
     if lst not in list_map:
         return None
 
-    # files = video_handler.list_files(list_map[lst])
     res = [f for f in os.listdir(list_map[lst]) if f.startswith(filename)]
     if not res:
         return None
