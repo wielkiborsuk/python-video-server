@@ -12,7 +12,7 @@
         <ul style="margin-left: 10px;">
           <li data-ng-repeat="f in list.files">
             <a data-ng-click="select(list.name, f)" class="ellipsize" title="{{ f.file }}"
-              data-ng-class="{true: 'green'}[f.ready]">
+              data-ng-class="{'green': f.ready, 'yellow': f.pending}">
               {{ f.file }}
             </a>
           </li>

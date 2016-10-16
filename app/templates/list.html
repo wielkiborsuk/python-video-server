@@ -9,7 +9,7 @@
     <ul class="nav">
       <li ng-repeat="f in files">
         <a href="" ng-click="select(list, f)" class="ellipsize" title="{{ f.file }}"
-          ng-class="{true: 'green'}[f.ready]">{{ f.file }}</a>
+          ng-class="{'green': f.ready, 'yellow': f.pending}">{{ f.file }}</a>
       </li>
     </ul>
     <div class="content">
