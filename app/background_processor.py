@@ -2,6 +2,7 @@ import os
 import queue
 import shlex
 import subprocess
+from timeit import default_timer as timer
 
 
 class UniqueQueue(queue.Queue):
@@ -26,11 +27,26 @@ class UniqueQueue(queue.Queue):
 def process_videos(queue):
     while True:
         item = queue.get()
-        print(item)
         # cmd = ('avconv -i {} -t 00:00:10 -threads auto -strict experimental {}'
         cmd = ('avconv -i {} -threads auto -strict experimental {}'
                .format(shlex.quote(item['file']), shlex.quote(item['tmpname'])))
         FNULL = open(os.devnull, 'w')
         subprocess.call(cmd, shell=True, stdout=FNULL, stderr=subprocess.STDOUT)
-        item['res'] = True
         queue.task_done()
+
+
+def benchmark(cmd):
+    print('measuring:', cmd)
+    start = timer()
+    FNULL = open(os.devnull, 'wb')
+    subprocess.call(cmd, stdout=FNULL, stderr=subprocess.STDOUT)
+    print('it took time:', timer()-start)
+
+
+def main():
+    input_file = 'input.mkv'
+    benchmark(['avconv', '-i', input_file, '-threads', 'auto', 'output_file.mp4'])
+
+
+if __name__ == "__main__":
+    main()
