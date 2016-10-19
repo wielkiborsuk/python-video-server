@@ -119,15 +119,12 @@ def send_file_partial(path):
     range_header = request.headers.get('Range', None)
 
     size = os.path.getsize(path)
-    byte1, byte2 = 0, None
 
     m = re.search('(\d+)-(\d*)', range_header)
     g = m.groups()
 
-    if g[0]:
-        byte1 = int(g[0])
-    if g[1]:
-        byte2 = int(g[1])
+    byte1 = int(g[0]) if g[0] else 0
+    byte2 = int(g[1]) if g[1] else None
 
     length = size - byte1
     if byte2 is not None:

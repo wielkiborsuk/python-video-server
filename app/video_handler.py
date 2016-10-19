@@ -39,8 +39,7 @@ def find_lists(basedir=video_basedir):
 
 
 def is_pending(file_path):
-    return (os.path.exists(tmpfilename(file_path)) and
-            get_msg_for_file(file_path) in queue)
+    return get_msg_for_file(file_path) in queue
 
 
 def is_ready(file_path):

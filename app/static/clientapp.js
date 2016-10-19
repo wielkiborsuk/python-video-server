@@ -3,11 +3,12 @@
 angular.module('clientApp', [])
   .controller('MainCtrl', function ($scope, $http, $timeout, $document) {
     $scope.curr = '';
+    var timeout = 2000;
 
     function request_video(list, file) {
       var url = '/video/request/' + list + '/' + file.file;
       $http.get(url).then(function (res) {
-        $timeout(function () { check_status(list, file) }, 2000, true);
+        $timeout(function () { check_status(list, file) }, timeout, true);
       });
     };
 
@@ -17,7 +18,7 @@ angular.module('clientApp', [])
         file.ready = res.data.ready;
         file.pending = res.data.pending;
         if (!file.ready) {
-          $timeout(function () { check_status(list, file) }, 2000, true);
+          $timeout(function () { check_status(list, file) }, timeout, true);
         }
       });
     }

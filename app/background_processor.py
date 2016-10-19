@@ -28,14 +28,16 @@ def process_videos(queue):
     while True:
         item = queue.get()
         # cmd =('avconv -i {} -t 00:00:10 -threads auto -strict experimental {}'
-        cmd = ['avconv', '-y', '-i', shlex.quote(item['file']),
+        cmd = ['avconv', '-y', '-i', item['file'],
                '-strict', 'experimental', '-preset', 'veryfast',
-               '-vf', 'scale=-2:320,format=yuv420p',
+               '-vf', 'scale=-2:320,format=yuv420p', '-movflags', 'faststart',
                # '-t', '00:01:00',
-               shlex.quote(item['tmpname'])]
+               item['tmpname']]
 
         FNULL = open(os.devnull, 'w')
         subprocess.call(cmd, stdout=FNULL, stderr=subprocess.STDOUT)
+        # subprocess.call(cmd)
+        queue.history.remove(item)
         queue.task_done()
 
 
